@@ -116,7 +116,7 @@ def test_a_file_changed_after_import_is_refused(tmp_path):
     con = pipeline.connect(":memory:")
     pipeline.load_raw(con, raw)
     p = raw / "invoices" / "invoice_KE_2026-03.csv"
-    p.write_text(p.read_text().replace("90.00", "91.00"))
+    p.write_text(p.read_text().replace("900.00", "901.00"))
     with pytest.raises(ValueError):
         pipeline.load_raw(con, raw)
 
