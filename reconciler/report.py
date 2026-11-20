@@ -80,7 +80,7 @@ def svg_active_share(con):
                 out.append(f'<path d="M{cx:.1f},{cy - 4.4:.1f} L{cx + 4:.1f},{cy + 3:.1f} L{cx - 4:.1f},{cy + 3:.1f}Z" class="dot f-{code}"/>')
         if pts:
             i, v = pts[-1]
-            out.append(f'<text x="{x(i) + 9:.1f}" y="{y(v) + (0 if code != "CO" else 13):.1f}" class="lbl l-{code}">{OFFICE_NAME[code]}</text>')
+            out.append(f'<text x="{x(i) + 9:.1f}" y="{y(v) + {'LB': -3, 'KE': 10, 'CO': 4}[code]:.1f}" class="lbl l-{code}">{OFFICE_NAME[code]}</text>')
     missing = [(r["office"], r["month"]) for r in data if not r["report_received"]]
     for code, m in missing:
         i = months.index(m)
@@ -231,10 +231,10 @@ def recommendations(con, as_of):
         "title": "Leave Kenya's seats alone: low usage there is late onboarding, not rejection",
         "body": (f"Over all six months only {pct(ke_cost['active_share_reported'])} of Kenya's seat-months were active, "
                  f"which makes it look like the weakest office at {money(ke_cost['cents_per_active_month'])} per active user per month. "
-                 f"But {burst['n']} seats were assigned on {burst['start_date']} and nobody used them until June. "
+                 f"But {burst['n']} seats were assigned on {burst['start_date']} and almost nobody used them before June. "
                  f"From {mlabel(ke_ob['start_month'])} onward {pct(ke_cost['active_share_since_start'])} are active and the cost falls to "
                  f"{money(ke_cost['cents_per_active_since_start'])}. The median Kenya user took {ke_lag['median_lag_months']:.0f} months from "
-                 f"getting a seat to first real use; in Lebanon and Colombia it took {lag['LB']['median_lag_months']:.0f}. "
+                 f"getting a seat to first real use; in Lebanon and Colombia it took {lag['LB']['median_lag_months']:.0f} months. "
                  f"{pools[[p['office'] for p in pools].index('KE')]['needs_evidence']} Kenya seats are still idle but sit inside the ramp-up window, so they are held back, not reclaimed."),
         "evidence": evidence_html(con, ["RAMP:KE"]),
     })
@@ -275,8 +275,8 @@ def seat_table(con, verdict):
     body = []
     for r in rows:
         why = REASON_TEXT.get(r["reason"], r["reason"])
-        d1 = "no data" if r["d1"] is None else f"{r['d1']} days"
-        d2 = "no data" if r["d2"] is None else f"{r['d2']} days"
+        d1 = "no data" if r["d1"] is None else f"{r['d1']} day{'s' if r['d1'] != 1 else ''}"
+        d2 = "no data" if r["d2"] is None else f"{r['d2']} day{'s' if r['d2'] != 1 else ''}"
         inner = evidence_html(con, ["SEAT:" + r["seat_id"]])
         body.append(
             f"<tr><td>{OFFICE_NAME[r['office']]}</td><td><b>{e(r['seat_id'])}</b><br><span class='muted'>{e(r['user_id'])}</span></td>"
@@ -293,7 +293,7 @@ def recon_table(con):
     for r in rows:
         flag = "ok" if r["diff_cents"] == 0 and r["status"] == "ok" else "bad"
         if r["naive_overcount"]:
-            note = f"<span class='pill warn'>seat reassigned: counting users would give {r['naive_overcount']} extra</span>"
+            note = f"<span class='pill warn'>reassigned: counting users gives +{r['naive_overcount']}</span>"
         elif r["unattributed_seats"]:
             note = f"<span class='muted'>{r['unattributed_seats']} billed, never assigned</span>"
         else:
@@ -398,7 +398,9 @@ code{font-family:Consolas,"SF Mono",monospace;font-size:.78rem;word-break:break-
 .pill.warn{background:var(--warn-soft);color:var(--warn)}
 .two{display:grid;grid-template-columns:1fr;gap:14px}
 @media(min-width:820px){.two{grid-template-columns:1fr 1fr}}
-.chart{width:100%;height:auto;display:block}
+.chart{width:100%;max-width:640px;height:auto;display:block;margin:0 auto}
+td:last-child details{white-space:nowrap}
+.recon td{white-space:nowrap}
 .chart text{font-family:"Segoe UI",system-ui,sans-serif}
 .tick{font-size:12px;fill:var(--muted)}
 .note{font-size:11.5px;fill:var(--muted);font-style:italic}

@@ -27,7 +27,7 @@ def cmd_build(args) -> int:
     print(f"reconciled {rec[0]} office-months, invoiced ${rec[1] / 100:,.2f}, difference ${rec[2] / 100:,.2f}")
     print(f"seats: {pool[2]} free, {pool[0]} reassignment candidates, {pool[1]} need more evidence")
     print(f"next quarter new spend: buy ${fc['buy'] / 100:,.2f}, reallocate ${fc['reallocate'] / 100:,.2f}")
-    print(f"report: {REPORT_PATH}")
+    print(f"report: {REPORT_PATH.relative_to(REPORT_PATH.parent.parent)}")
     con.close()
     return 0
 

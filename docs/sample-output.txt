@@ -1,0 +1,17 @@
+raw files: 39 loaded, 0 already loaded, 1 duplicate of an earlier file
+reconciled 18 office-months, invoiced $19,812.00, difference $0.00
+seats: 8 free, 10 reassignment candidates, 9 need more evidence
+next quarter new spend: buy $2,116.80, reallocate $540.00
+as_of       threshold  LB  KE  CO  needs_evidence
+2026-09-20          1   1   2   6               8
+2026-09-20          2   2   0   8               9
+2026-09-20          3   2   0   8               9
+2026-09-20          4   2   0   8               9
+2026-09-20          5   2   0   8              11
+2026-09-20          6   2   0   8              19
+2026-10-10          1   1   2   5               8
+2026-10-10          2   2   0   7              10
+2026-10-10          3   2   0   7              10
+2026-10-10          4   2   0   7              10
+2026-10-10          5   2   0   7              15
+2026-10-10          6   2   0   7              22
