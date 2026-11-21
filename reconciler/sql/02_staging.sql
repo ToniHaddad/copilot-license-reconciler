@@ -5,9 +5,9 @@ FROM raw_files f;
 
 CREATE OR REPLACE TABLE stg_invoice AS
 SELECT i.file_name, i.line_no, i.raw_line, i.invoice_id,
-       upper(trim(i.office)) AS office,
+       upper(trim(i.centre)) AS centre,
+       upper(trim(i.product)) AS product,
        (i.period || '-01')::DATE AS month,
-       i.sku,
        i.quantity::INTEGER AS qty,
        round(i.unit_price::DECIMAL(12,2) * 100)::BIGINT AS unit_cents,
        round(i.amount::DECIMAL(12,2) * 100)::BIGINT AS amount_cents,
@@ -15,13 +15,14 @@ SELECT i.file_name, i.line_no, i.raw_line, i.invoice_id,
            = round(i.amount::DECIMAL(12,2) * 100)::BIGINT AS invoice_math_ok
 FROM raw_invoice i JOIN stg_files f USING (file_name)
 WHERE f.in_scope AND f.duplicate_of IS NULL
-QUALIFY row_number() OVER (PARTITION BY i.invoice_id, i.sku
+QUALIFY row_number() OVER (PARTITION BY i.invoice_id, upper(trim(i.centre)), upper(trim(i.product))
                            ORDER BY f.received_date DESC, i.file_name, i.line_no) = 1;
 
 CREATE OR REPLACE TABLE stg_events AS
 SELECT e.file_name, e.line_no, e.raw_line, e.event_id,
        e.event_date::DATE AS event_date,
-       upper(trim(e.office)) AS office,
+       upper(trim(e.centre)) AS centre,
+       upper(trim(e.product)) AS product,
        trim(e.seat_id) AS seat_id,
        lower(trim(e.event_type)) AS event_type,
        upper(trim(e.user_id)) AS user_id,
@@ -34,15 +35,17 @@ QUALIFY row_number() OVER (PARTITION BY e.event_id
 
 CREATE OR REPLACE TABLE stg_usage AS
 SELECT u.file_name, u.line_no, u.raw_line,
-       upper(trim(u.office)) AS office,
+       upper(trim(u.centre)) AS centre,
+       upper(trim(u.product)) AS product,
        (trim(u.report_month) || '-01')::DATE AS month,
        upper(trim(u.user_id)) AS user_id,
+       trim(u.department) AS department,
        u.active_days::INTEGER AS active_days,
-       u.copilot_actions::INTEGER AS actions,
+       u.actions::INTEGER AS actions,
        nullif(trim(u.last_activity_date), '')::DATE AS last_activity_date
 FROM raw_usage u JOIN stg_files f USING (file_name)
 WHERE f.in_scope AND f.duplicate_of IS NULL
-QUALIFY row_number() OVER (PARTITION BY upper(trim(u.office)), trim(u.report_month), upper(trim(u.user_id))
+QUALIFY row_number() OVER (PARTITION BY upper(trim(u.centre)), upper(trim(u.product)), trim(u.report_month), upper(trim(u.user_id))
                            ORDER BY u.file_name, u.line_no) = 1;
 
 CREATE OR REPLACE TABLE bounds AS

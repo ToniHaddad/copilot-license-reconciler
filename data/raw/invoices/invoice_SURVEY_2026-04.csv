@@ -1,0 +1,6 @@
+invoice_id,centre,period,product,description,quantity,unit_price,amount,currency
+INV-SURVEY-2026-04,ZAH,2026-04,SURVEY,"FieldForm Pro (Fieldform Labs), per seat per month",7,18.00,126.00,USD
+INV-SURVEY-2026-04,JBE,2026-04,SURVEY,"FieldForm Pro (Fieldform Labs), per seat per month",6,18.00,108.00,USD
+INV-SURVEY-2026-04,SAI,2026-04,SURVEY,"FieldForm Pro (Fieldform Labs), per seat per month",5,18.00,90.00,USD
+INV-SURVEY-2026-04,TRI,2026-04,SURVEY,"FieldForm Pro (Fieldform Labs), per seat per month",4,18.00,72.00,USD
+INV-SURVEY-2026-04,HQ,2026-04,SURVEY,"FieldForm Pro (Fieldform Labs), per seat per month",3,18.00,54.00,USD

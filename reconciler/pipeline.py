@@ -7,12 +7,12 @@ from pathlib import Path
 
 import duckdb
 
-from .config import BUILD_DIR, DB_PATH, DEFAULT_AS_OF, FORECAST_MONTHS, PARAMS, RAW_DIR, REQUESTS, SQL_DIR
+from .config import BUILD_DIR, DB_PATH, DEFAULT_AS_OF, FORECAST_MONTHS, FORECAST_PRODUCT, PARAMS, RAW_DIR, REQUESTS, SQL_DIR
 
 KIND_TABLE = {
     "invoice": ("raw_invoice", 9),
-    "events": ("raw_events", 7),
-    "usage": ("raw_usage", 6),
+    "events": ("raw_events", 8),
+    "usage": ("raw_usage", 8),
 }
 
 
@@ -55,8 +55,8 @@ def load_raw(con, raw_dir: Path = RAW_DIR) -> dict:
         original = con.execute("SELECT file_name FROM raw_files WHERE sha256 = ? AND duplicate_of IS NULL", [digest]).fetchone()
         if original:
             con.execute(
-                "INSERT INTO raw_files VALUES (?, ?, ?, ?, ?, ?, ?, 0)",
-                [name, m["kind"], m["office"], m["period"], m["received_date"], digest, original[0]],
+                "INSERT INTO raw_files VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)",
+                [name, m["kind"], m["centre"], m["product"], m["period"], m["received_date"], digest, original[0]],
             )
             stats["duplicates"] += 1
             continue
@@ -73,8 +73,8 @@ def load_raw(con, raw_dir: Path = RAW_DIR) -> dict:
         marks = ", ".join(["?"] * (3 + ncols))
         con.executemany(f"INSERT INTO {table} VALUES ({marks})", rows)
         con.execute(
-            "INSERT INTO raw_files VALUES (?, ?, ?, ?, ?, ?, NULL, ?)",
-            [name, m["kind"], m["office"], m["period"], m["received_date"], digest, len(rows)],
+            "INSERT INTO raw_files VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?)",
+            [name, m["kind"], m["centre"], m["product"], m["period"], m["received_date"], digest, len(rows)],
         )
         stats["loaded"] += 1
     return stats
@@ -83,9 +83,9 @@ def load_raw(con, raw_dir: Path = RAW_DIR) -> dict:
 def set_params(con, as_of: str = DEFAULT_AS_OF, requests: dict | None = None, overrides: dict | None = None):
     p = dict(PARAMS)
     p.update(overrides or {})
-    con.execute(f"CREATE OR REPLACE TABLE params AS SELECT DATE '{as_of}' AS as_of, {FORECAST_MONTHS} AS forecast_months, "
+    con.execute(f"CREATE OR REPLACE TABLE params AS SELECT DATE '{as_of}' AS as_of, {FORECAST_MONTHS} AS forecast_months, '{FORECAST_PRODUCT}' AS forecast_product, "
                 + ", ".join(f"{v!r} AS {k}" for k, v in p.items()))
-    con.execute("CREATE OR REPLACE TABLE requests (office VARCHAR, seats INTEGER)")
+    con.execute("CREATE OR REPLACE TABLE requests (centre VARCHAR, seats INTEGER)")
     con.executemany("INSERT INTO requests VALUES (?, ?)", list((requests or REQUESTS).items()))
 
 

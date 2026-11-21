@@ -1,0 +1,6 @@
+invoice_id,centre,period,product,description,quantity,unit_price,amount,currency
+INV-ASSIST-2026-04,ZAH,2026-04,ASSIST,"Cedar Assist (Cedarline Software), per seat per month",8,20.00,160.00,USD
+INV-ASSIST-2026-04,JBE,2026-04,ASSIST,"Cedar Assist (Cedarline Software), per seat per month",13,20.00,260.00,USD
+INV-ASSIST-2026-04,SAI,2026-04,ASSIST,"Cedar Assist (Cedarline Software), per seat per month",12,20.00,240.00,USD
+INV-ASSIST-2026-04,TRI,2026-04,ASSIST,"Cedar Assist (Cedarline Software), per seat per month",6,20.00,120.00,USD
+INV-ASSIST-2026-04,HQ,2026-04,ASSIST,"Cedar Assist (Cedarline Software), per seat per month",20,20.00,400.00,USD

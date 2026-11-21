@@ -1,2 +1,0 @@
-invoice_id,office,period,sku,description,quantity,unit_price,amount,currency
-INV-LB-2026-03,LB,2026-03,M365-COPILOT,"Microsoft 365 Copilot, per seat per month",32,30.00,960.00,USD

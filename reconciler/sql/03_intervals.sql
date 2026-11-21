@@ -1,5 +1,6 @@
 -- Assignment history as dated intervals [start_date, end_date). Events are never overwritten;
 -- each event only decides who holds the seat from its date until the seat's next event.
+-- A seat belongs to one product and one centre. Seat ids are never shared between products.
 CREATE OR REPLACE TABLE seat_changes AS
 SELECT *,
        CASE WHEN event_type = 'unassign' THEN NULL ELSE user_id END AS holder,
@@ -10,7 +11,7 @@ FROM stg_events
 WINDOW w AS (PARTITION BY seat_id ORDER BY event_date, event_id);
 
 CREATE OR REPLACE TABLE seat_intervals AS
-SELECT c.seat_id, c.office, c.holder AS user_id,
+SELECT c.seat_id, c.centre, c.product, c.holder AS user_id,
        c.event_date AS start_date,
        coalesce(c.next_date, b.window_end) AS end_date,
        c.next_date IS NULL AS is_open,
@@ -23,13 +24,13 @@ WHERE c.holder IS NOT NULL
 
 -- A seat exists (and is billed) from the month of its first event.
 CREATE OR REPLACE TABLE seats AS
-SELECT seat_id, office, min(event_date) AS first_event,
+SELECT seat_id, centre, product, min(event_date) AS first_event,
        date_trunc('month', min(event_date))::DATE AS first_month
-FROM stg_events GROUP BY seat_id, office;
+FROM stg_events GROUP BY seat_id, centre, product;
 
 -- One row per seat per day: the proration base.
 CREATE OR REPLACE TABLE seat_day AS
-SELECT s.seat_id, s.office, t.d::DATE AS day,
+SELECT s.seat_id, s.centre, s.product, t.d::DATE AS day,
        date_trunc('month', t.d)::DATE AS month,
        i.user_id AS holder
 FROM seats s

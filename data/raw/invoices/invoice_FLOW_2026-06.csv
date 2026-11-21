@@ -1,0 +1,3 @@
+invoice_id,centre,period,product,description,quantity,unit_price,amount,currency
+INV-FLOW-2026-06,JBE,2026-06,FLOW,"FlowLoop (Loopwork Ltd), per seat per month",2,24.00,48.00,USD
+INV-FLOW-2026-06,HQ,2026-06,FLOW,"FlowLoop (Loopwork Ltd), per seat per month",4,24.00,96.00,USD

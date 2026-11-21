@@ -1,0 +1,6 @@
+invoice_id,centre,period,product,description,quantity,unit_price,amount,currency
+INV-OFFICE-2026-05,ZAH,2026-05,OFFICE,"Cedar Suite (Cedarline Software), per seat per month",20,12.50,250.00,USD
+INV-OFFICE-2026-05,JBE,2026-05,OFFICE,"Cedar Suite (Cedarline Software), per seat per month",24,12.50,300.00,USD
+INV-OFFICE-2026-05,SAI,2026-05,OFFICE,"Cedar Suite (Cedarline Software), per seat per month",19,12.50,237.50,USD
+INV-OFFICE-2026-05,TRI,2026-05,OFFICE,"Cedar Suite (Cedarline Software), per seat per month",16,12.50,200.00,USD
+INV-OFFICE-2026-05,HQ,2026-05,OFFICE,"Cedar Suite (Cedarline Software), per seat per month",42,12.50,525.00,USD

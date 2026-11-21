@@ -1,5 +1,4 @@
 import csv
-import shutil
 from pathlib import Path
 
 import pytest
@@ -31,39 +30,41 @@ def build_at(as_of, raw=RAW_DIR, **kw):
 
 
 def make_raw(tmp: Path, invoices, events, usage=(), received="2026-04-05"):
-    """Write a tiny raw folder. invoices: (office, period, qty, unit); events: tuples; usage: (office, period, user, days)."""
-    tmp.mkdir(parents=True, exist_ok=True)
-    (tmp / "invoices").mkdir(exist_ok=True)
-    (tmp / "events").mkdir(exist_ok=True)
-    (tmp / "usage").mkdir(exist_ok=True)
+    """Write a tiny raw folder.
+    invoices: (centre, product, period, qty, unit_cents)
+    events:   (date, centre, product, seat, type, user, from_user)
+    usage:    (centre, period, product, user, active_days)"""
+    for sub in ("invoices", "events", "usage"):
+        (tmp / sub).mkdir(parents=True, exist_ok=True)
     manifest = []
-    for office, period, qty, unit in invoices:
-        name = f"invoices/inv_{office}_{period}.csv"
+    for centre, product, period, qty, unit in invoices:
+        name = f"invoices/inv_{product}_{centre}_{period}.csv"
         with (tmp / name).open("w", newline="") as f:
             w = csv.writer(f, lineterminator="\n")
-            w.writerow(["invoice_id", "office", "period", "sku", "description", "quantity", "unit_price", "amount", "currency"])
-            w.writerow([f"INV-{office}-{period}", office, period, "M365-COPILOT", "seats", qty, f"{unit / 100:.2f}", f"{qty * unit / 100:.2f}", "USD"])
-        manifest.append([name, "invoice", office, period, received])
+            w.writerow(["invoice_id", "centre", "period", "product", "description", "quantity", "unit_price", "amount", "currency"])
+            w.writerow([f"INV-{product}-{centre}-{period}", centre, period, product, "seats", qty,
+                        f"{unit / 100:.2f}", f"{qty * unit / 100:.2f}", "USD"])
+        manifest.append([name, "invoice", "ALL", product, period, received])
     name = "events/events.csv"
     with (tmp / name).open("w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
-        w.writerow(["event_id", "event_date", "office", "seat_id", "event_type", "user_id", "from_user_id"])
+        w.writerow(["event_id", "event_date", "centre", "product", "seat_id", "event_type", "user_id", "from_user_id"])
         for i, ev in enumerate(events, start=1):
             w.writerow([f"E{i:03d}", *ev])
-    manifest.append([name, "events", "LB", "all", received])
+    manifest.append([name, "events", "ZAH", "ALL", "all", received])
     by = {}
-    for office, period, user, days in usage:
-        by.setdefault((office, period), []).append((user, days))
-    for (office, period), rows in by.items():
-        name = f"usage/usage_{office}_{period}.csv"
+    for centre, period, product, user, days in usage:
+        by.setdefault((centre, period), []).append((product, user, days))
+    for (centre, period), rows in by.items():
+        name = f"usage/usage_{centre}_{period}.csv"
         with (tmp / name).open("w", newline="") as f:
             w = csv.writer(f, lineterminator="\n")
-            w.writerow(["office", "report_month", "user_id", "active_days", "copilot_actions", "last_activity_date"])
-            for user, days in rows:
-                w.writerow([office, period, user, days, days * 5, ""])
-        manifest.append([name, "usage", office, period, received])
+            w.writerow(["centre", "report_month", "product", "user_id", "department", "active_days", "actions", "last_activity_date"])
+            for product, user, days in rows:
+                w.writerow([centre, period, product, user, "Social", days, days * 5, ""])
+        manifest.append([name, "usage", centre, "ALL", period, received])
     with (tmp / "manifest.csv").open("w", newline="") as f:
         w = csv.writer(f, lineterminator="\n")
-        w.writerow(["file_name", "kind", "office", "period", "received_date"])
+        w.writerow(["file_name", "kind", "centre", "product", "period", "received_date"])
         w.writerows(manifest)
     return tmp
